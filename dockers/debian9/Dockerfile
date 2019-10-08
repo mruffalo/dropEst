@@ -41,3 +41,5 @@ ENV PATH=/opt/dropEst/build:$PATH
 
 RUN useradd -m user
 USER user
+
+CMD "/bin/bash"
