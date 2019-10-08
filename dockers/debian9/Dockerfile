@@ -37,6 +37,9 @@ RUN \
   cmake ../ && \
   make
 
+# TODO: Figure out why this was necessary
+RUN echo /usr/local/lib/R/lib > /etc/ld.so.conf.d/R-lib.conf && ldconfig
+
 ENV PATH=/opt/dropEst/build:$PATH
 
 RUN useradd -m user
