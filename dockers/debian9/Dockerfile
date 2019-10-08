@@ -1,3 +1,5 @@
+FROM mruffalo/star-grch38:2.6.1e as INDEX
+
 FROM rocker/r-ver:3.6.1
 MAINTAINER Viktor Petukhov "viktor.s.petuhov@ya.ru"
 
@@ -42,7 +44,6 @@ RUN echo /usr/local/lib/R/lib > /etc/ld.so.conf.d/R-lib.conf && ldconfig
 
 ENV PATH=/opt/dropEst/build:$PATH
 
-RUN useradd -m user
-USER user
+COPY --from=INDEX /opt/refdata-cellranger-GRCh38-3.0.0/genes/ /opt/refdata-cellranger-GRCh38-3.0.0/genes/
 
 CMD "/bin/bash"
