@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.4
+FROM rocker/r-ver:3.6.1
 MAINTAINER Viktor Petukhov "viktor.s.petuhov@ya.ru"
 
 RUN apt-get update --yes && apt-get install --no-install-recommends --yes \
@@ -14,25 +14,21 @@ RUN apt-get update --yes && apt-get install --no-install-recommends --yes \
   libboost-test-dev \
   libcurl4-openssl-dev \
   libssl-dev \
+  libxml2-dev \
   libz-dev \
   nano \
-  pandoc
+  pandoc \
+&& rm -rf /var/cache/apt/*
 
 RUN \
-  R -e 'chooseCRANmirror(ind=52); install.packages(c("devtools", "Rcpp","RcppEigen", "RInside", "Matrix", "optparse", "rmarkdown", "withr"))'
+  R -e 'install.packages(c("devtools", "Rcpp","RcppEigen", "RInside", "Matrix", "optparse", "rmarkdown", "withr"))'
 
-RUN useradd -m user
-USER user
-ENTRYPOINT ["/bin/bash"]
-WORKDIR "/home/user"
+WORKDIR "/opt"
 
-RUN \
-  git clone https://github.com/hms-dbmi/dropEst.git && \
-  mkdir -p ~/R/x86_64-redhat-linux-gnu-library/3.4
+RUN git clone https://github.com/hms-dbmi/dropEst.git
 
 RUN \
-  R -e 'dir.create(Sys.getenv("R_LIBS_USER"), recursive=T)' && \
-  R -e 'chooseCRANmirror(ind=52); install.packages("ks", dependencies=c("Depends", "Imports", "LinkingTo"))' && \
+  R -e 'install.packages("ks", dependencies=c("Depends", "Imports", "LinkingTo"))' && \
   R -e 'devtools::install_local("~/dropEst/dropestr/", dependencies=T)'
 
 RUN \
@@ -41,6 +37,7 @@ RUN \
   cmake ../ && \
   make
 
-ENV PATH=/home/user/dropEst/build:$PATH \
-  LD_LIBRARY_PATH=/usr/local/lib/R/lib/:$LD_LIBRARY_PATH \
-  R_PROFILE=~/.Rprofile
+ENV PATH=/opt/dropEst/build:$PATH
+
+RUN useradd -m user
+USER user
